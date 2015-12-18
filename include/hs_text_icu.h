@@ -6,8 +6,9 @@
 
 #include "unicode/ubrk.h"
 #include "unicode/uchar.h"
-#include "unicode/ucol.h"
 #include "unicode/ucnv.h"
+#include "unicode/ucol.h"
+#include "unicode/ucsdet.h"
 #include "unicode/uiter.h"
 #include "unicode/unorm.h"
 #include "unicode/uregex.h"
@@ -218,3 +219,12 @@ int32_t __hs_uspoof_getSkeleton(USpoofChecker *sc, int32_t checks,
 int32_t __hs_uspoof_serialize(USpoofChecker *sc, void *data, int32_t capacity,
                               UErrorCode *status);
 void __hs_uspoof_close(USpoofChecker *sc);
+
+
+/* ucsdet.h */
+
+void __hs_ucsdet_setText(UCharsetDetector *ucsd, const char *textIn, int32_t len, UErrorCode *status);
+
+void __hs_ucsdet_setDeclaredEncoding(UCharsetDetector *ucsd, const char *encoding, int32_t length, UErrorCode *status);
+
+void __hs_ucsdet_detect(UCharsetDetector *ucsd, UErrorCode *status);

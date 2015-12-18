@@ -544,3 +544,15 @@ void __hs_uspoof_close(USpoofChecker *sc)
 {
     uspoof_close(sc);
 }
+
+void __hs_ucsdet_setText(UCharsetDetector *ucsd, const char *textIn, int32_t len, UErrorCode *status) {
+    ucsdet_setText(ucsd, textIn, len, status);
+}
+
+void __hs_ucsdet_setDeclaredEncoding(UCharsetDetector *ucsd, const char *encoding, int32_t length, UErrorCode *status) {
+    ucsdet_setDeclaredEncoding(ucsd, encoding, length, status);
+}
+
+void __hs_ucsdet_detect(UCharsetDetector *ucsd, UErrorCode *status) {
+    ucsdet_detect(ucsd, status);
+}
