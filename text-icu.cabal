@@ -62,6 +62,7 @@ library
       Data.Text.ICU.Normalize
       Data.Text.ICU.Regex
       Data.Text.ICU.Spoof
+      Data.Text.ICU.Detect
       Data.Text.ICU.Types
   other-modules:
       Data.Text.ICU.BitMask
@@ -70,6 +71,7 @@ library
       Data.Text.ICU.Collate.Internal
       Data.Text.ICU.Collate.Pure
       Data.Text.ICU.Convert.Internal
+      Data.Text.ICU.Detect.Internal
       Data.Text.ICU.Error.Internal
       Data.Text.ICU.Internal
       Data.Text.ICU.Iterator
