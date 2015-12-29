@@ -10,9 +10,12 @@ module Data.Text.ICU.Detect.Internal
 
 import Data.Int (Int32)
 import Foreign.ForeignPtr (ForeignPtr)
+import Data.IORef (IORef)
+import Data.Text (Text)
 
 data CharsetDetector a = CD {
-        cdStatus :: Int32 -> a
+        cdText :: IORef Text
+      , cdStatus :: Int32 -> a
       , cdDetector :: ForeignPtr UCharsetDetector
       }
 
