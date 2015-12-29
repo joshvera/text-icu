@@ -9,7 +9,8 @@ module Data.Text.ICU.Detect.Internal
       CharsetMatch(..),
       UCharsetMatch,
       getConfidence,
-      getName
+      getName,
+      getLanguage
      ) where
 
 import Data.Int (Int32)
@@ -42,13 +43,20 @@ instance Show CharsetMatch where
 
 getName :: CharsetMatch -> String
 getName CM{..} = unsafePerformIO $
-        peekCString =<< handleError (ucsdet_getName cmMatch)
+  peekCString =<< handleError (ucsdet_getName cmMatch)
 
 getConfidence :: CharsetMatch -> Int32
 getConfidence CM{..} = unsafePerformIO $
   handleError (ucsdet_getConfidence cmMatch)
 
+getLanguage :: CharsetMatch -> String
+getLanguage CM{..} = unsafePerformIO $
+  peekCString =<< handleError (ucsdet_getLanguage cmMatch)
+
 foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_getName" ucsdet_getName
+    :: Ptr UCharsetMatch -> Ptr UErrorCode -> IO CString
+
+foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_getLanguage" ucsdet_getLanguage
     :: Ptr UCharsetMatch -> Ptr UErrorCode -> IO CString
 
 foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_getConfidence" ucsdet_getConfidence

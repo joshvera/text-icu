@@ -41,6 +41,13 @@ detect CD{..} = do
   writeIORef cdMatch match
   return match
 
+detectCharset :: Text -> IO CharsetMatch
+detectCharset text = do
+  detector <- open (const ())
+  setText detector text
+  detect detector
+
+
 foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_open" ucsdet_open :: Ptr UErrorCode -> IO (Ptr UCharsetDetector)
 
 foreign import ccall unsafe "hs_text_icu.h &__hs_ucsdet_close" ucsdet_close :: FunPtr (Ptr UCharsetDetector -> IO ())
