@@ -14,7 +14,7 @@ module Data.Text.ICU.Detect.Internal
      ) where
 
 import Data.Int (Int32)
-import Foreign.ForeignPtr (ForeignPtr)
+import Foreign.ForeignPtr (ForeignPtr, withForeignPtr)
 import Foreign.Ptr (Ptr)
 import Data.IORef (IORef)
 import Data.Text (Text)
@@ -33,7 +33,7 @@ data CharsetDetector a = CD {
 
 data UCharsetDetector
 
-data CharsetMatch = CM { cmMatch :: !(Ptr UCharsetMatch) }
+data CharsetMatch = CM { cmMatch :: !(ForeignPtr UCharsetMatch) }
                   deriving (Eq, Typeable)
 
 data UCharsetMatch
@@ -43,15 +43,18 @@ instance Show CharsetMatch where
 
 getName :: CharsetMatch -> String
 getName CM{..} = unsafePerformIO $
-  peekCString =<< handleError (ucsdet_getName cmMatch)
+  withForeignPtr cmMatch $ \p ->
+                            peekCString =<< handleError (ucsdet_getName p)
 
 getConfidence :: CharsetMatch -> Int32
 getConfidence CM{..} = unsafePerformIO $
-  handleError (ucsdet_getConfidence cmMatch)
+  withForeignPtr cmMatch $ \p ->
+                            handleError (ucsdet_getConfidence p)
 
 getLanguage :: CharsetMatch -> String
 getLanguage CM{..} = unsafePerformIO $
-  peekCString =<< handleError (ucsdet_getLanguage cmMatch)
+  withForeignPtr cmMatch $ \p ->
+                            peekCString =<< handleError (ucsdet_getLanguage p)
 
 foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_getName" ucsdet_getName
     :: Ptr UCharsetMatch -> Ptr UErrorCode -> IO CString

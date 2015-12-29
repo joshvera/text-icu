@@ -1,6 +1,6 @@
 {-# LANGUAGE ForeignFunctionInterface, RecordWildCards #-}
 
-module Data.Text.ICU.Detect where
+module Data.Text.ICU.Detect (detectCharset, getName, getConfidence, getLanguage) where
 
 import Data.Int (Int32)
 import Foreign.C.String (CString)
@@ -10,13 +10,14 @@ import Data.Text.Foreign (withCStringLen)
 import Data.Text.ICU.Error.Internal (UErrorCode, handleError)
 import Data.Text.ICU.Detect.Internal
 import Foreign.Ptr (FunPtr, Ptr, nullPtr)
-import Foreign.ForeignPtr (newForeignPtr, withForeignPtr)
+import Foreign.ForeignPtr (newForeignPtr, newForeignPtr_, withForeignPtr)
 
 open :: (Int32 -> a) -> IO (CharsetDetector a)
 open f = do
   cd <- handleError ucsdet_open
   r <- newIORef empty
-  match <- newIORef (CM nullPtr)
+  emptyMatch <- CM <$> newForeignPtr_ nullPtr
+  match <- newIORef emptyMatch
   encoding <- newIORef empty
   CD r encoding match f `fmap` newForeignPtr ucsdet_close cd
 
@@ -35,11 +36,12 @@ setDeclaredEncoding CD{..} t =
     writeIORef cdEncoding t
 
 detect :: CharsetDetector a -> IO CharsetMatch
-detect CD{..} = do
-  cm <- withForeignPtr cdDetector $ \p -> handleError (ucsdet_detect p)
-  let match = CM cm
-  writeIORef cdMatch match
-  return match
+detect CD{..} =
+  withForeignPtr cdDetector $ \p -> do
+    cm <- handleError (ucsdet_detect p)
+    match <- CM <$> newForeignPtr_ cm
+    writeIORef cdMatch match
+    return match
 
 detectCharset :: Text -> IO CharsetMatch
 detectCharset text = do
