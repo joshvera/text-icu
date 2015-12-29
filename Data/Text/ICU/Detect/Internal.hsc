@@ -10,22 +10,23 @@ module Data.Text.ICU.Detect.Internal
       UCharsetMatch,
       getConfidence,
       getName,
-      getLanguage
+      getLanguage,
+      detect
      ) where
 
 import Data.Int (Int32)
 import Foreign.ForeignPtr (ForeignPtr, withForeignPtr)
 import Foreign.Ptr (Ptr)
 import Data.IORef (IORef)
-import Data.Text (Text)
+import Data.ByteString (ByteString)
 import Data.Typeable (Typeable)
 import Data.Text.ICU.Error.Internal (UErrorCode, handleError)
 import Foreign.C.String (CString, peekCString)
 import System.IO.Unsafe (unsafePerformIO)
 
 data CharsetDetector a = CD {
-        cdText :: IORef Text
-      , cdEncoding :: IORef Text
+        cdBytestring :: IORef ByteString
+      , cdEncoding :: IORef ByteString
       , cdMatch :: IORef CharsetMatch
       , cdStatus :: Int32 -> a
       , cdDetector :: ForeignPtr UCharsetDetector
@@ -39,20 +40,27 @@ data CharsetMatch = CM { cmMatch :: !(ForeignPtr UCharsetMatch) }
 data UCharsetMatch
 
 instance Show CharsetMatch where
-    show c = "CharsetMatch " ++ show (getName c)
+    show c = "CharsetMatch " ++ show (unsafePerformIO $ getName c)
 
-getName :: CharsetMatch -> String
-getName CM{..} = unsafePerformIO $
+
+detect :: CharsetDetector a -> IO String
+detect CD{..} =
+  withForeignPtr cdDetector $ \p -> do
+    match <- handleError (ucsdet_detect p)
+    peekCString =<< handleError (ucsdet_getName match)
+
+getName :: CharsetMatch -> IO String
+getName CM{..} =
   withForeignPtr cmMatch $ \p ->
                             peekCString =<< handleError (ucsdet_getName p)
 
-getConfidence :: CharsetMatch -> Int32
-getConfidence CM{..} = unsafePerformIO $
+getConfidence :: CharsetMatch -> IO Int32
+getConfidence CM{..} =
   withForeignPtr cmMatch $ \p ->
                             handleError (ucsdet_getConfidence p)
 
-getLanguage :: CharsetMatch -> String
-getLanguage CM{..} = unsafePerformIO $
+getLanguage :: CharsetMatch -> IO String
+getLanguage CM{..} =
   withForeignPtr cmMatch $ \p ->
                             peekCString =<< handleError (ucsdet_getLanguage p)
 
@@ -64,3 +72,5 @@ foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_getLanguage" ucsdet_getLa
 
 foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_getConfidence" ucsdet_getConfidence
     :: Ptr UCharsetMatch -> Ptr UErrorCode -> IO Int32
+
+foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_detect" ucsdet_detect :: Ptr UCharsetDetector -> Ptr UErrorCode -> IO (Ptr UCharsetMatch)

@@ -5,8 +5,7 @@ module Data.Text.ICU.Detect (detectCharset, getName, getConfidence, getLanguage)
 import Data.Int (Int32)
 import Foreign.C.String (CString)
 import Data.IORef (newIORef, writeIORef)
-import Data.Text (Text, empty)
-import Data.Text.Foreign (withCStringLen)
+import Data.ByteString (ByteString, empty, useAsCStringLen)
 import Data.Text.ICU.Error.Internal (UErrorCode, handleError)
 import Data.Text.ICU.Detect.Internal
 import Foreign.Ptr (FunPtr, Ptr, nullPtr)
@@ -21,29 +20,21 @@ open f = do
   encoding <- newIORef empty
   CD r encoding match f `fmap` newForeignPtr ucsdet_close cd
 
-setText :: CharsetDetector a -> Text -> IO ()
+setText :: CharsetDetector a -> ByteString -> IO ()
 setText CD{..} t =
-  withCStringLen t $ \(ptr, len) -> do
-      withForeignPtr cdDetector $ \p -> handleError $
-                                        ucsdet_setText p ptr (fromIntegral len)
-      writeIORef cdText t
+  useAsCStringLen t $ \(ptr, len) -> do
+            withForeignPtr cdDetector $ \p -> handleError $
+                                              ucsdet_setText p ptr (fromIntegral len)
+            writeIORef cdBytestring t
 
-setDeclaredEncoding :: CharsetDetector a -> Text -> IO ()
+setDeclaredEncoding :: CharsetDetector a -> ByteString -> IO ()
 setDeclaredEncoding CD{..} t =
-  withCStringLen t $ \(ptr, len) -> do
-    withForeignPtr cdDetector $ \p -> handleError $
-                                      ucsdet_setDeclaredEncoding p ptr (fromIntegral len)
-    writeIORef cdEncoding t
+  useAsCStringLen t $ \(ptr, len) -> do
+                   withForeignPtr cdDetector $ \p -> handleError $
+                                                     ucsdet_setDeclaredEncoding p ptr (fromIntegral len)
+                   writeIORef cdEncoding t
 
-detect :: CharsetDetector a -> IO CharsetMatch
-detect CD{..} =
-  withForeignPtr cdDetector $ \p -> do
-    cm <- handleError (ucsdet_detect p)
-    match <- CM <$> newForeignPtr_ cm
-    writeIORef cdMatch match
-    return match
-
-detectCharset :: Text -> IO CharsetMatch
+detectCharset :: ByteString -> IO String
 detectCharset text = do
   detector <- open (const ())
   setText detector text
