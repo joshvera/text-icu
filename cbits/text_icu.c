@@ -547,8 +547,8 @@ void __hs_uspoof_close(USpoofChecker *sc)
 
 /** ucsdet **/
 
-void __hs_ucsdet_open(UErrorCode *status) {
-    ucsdet_open(status);
+UCharsetDetector *__hs_ucsdet_open(UErrorCode *status) {
+    return ucsdet_open(status);
 }
 
 void __hs_ucsdet_close(UCharsetDetector *ucsd) {

@@ -223,6 +223,10 @@ void __hs_uspoof_close(USpoofChecker *sc);
 
 /* ucsdet.h */
 
+UCharsetDetector *__hs_ucsdet_open(UErrorCode *status);
+
+void __hs_ucsdet_close(UCharsetDetector *ucsd);
+
 void __hs_ucsdet_setText(UCharsetDetector *ucsd, const char *textIn, int32_t len, UErrorCode *status);
 
 void __hs_ucsdet_setDeclaredEncoding(UCharsetDetector *ucsd, const char *encoding, int32_t length, UErrorCode *status);
