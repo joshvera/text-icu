@@ -8,16 +8,17 @@ import Data.IORef (newIORef, writeIORef)
 import Data.Text (Text, empty)
 import Data.Text.Foreign (withCStringLen)
 import Data.Text.ICU.Error.Internal (UErrorCode, handleError)
-import Data.Text.ICU.Detect.Internal (CharsetDetector(..), UCharsetDetector)
-import Foreign.Ptr (FunPtr, Ptr)
+import Data.Text.ICU.Detect.Internal
+import Foreign.Ptr (FunPtr, Ptr, nullPtr)
 import Foreign.ForeignPtr (newForeignPtr, withForeignPtr)
 
 open :: (Int32 -> a) -> IO (CharsetDetector a)
 open f = do
   cd <- handleError ucsdet_open
   r <- newIORef empty
+  match <- newIORef (CM nullPtr)
   encoding <- newIORef empty
-  CD r encoding f `fmap` newForeignPtr ucsdet_close cd
+  CD r encoding match f `fmap` newForeignPtr ucsdet_close cd
 
 setText :: CharsetDetector a -> Text -> IO ()
 setText CD{..} t =
@@ -33,10 +34,19 @@ setDeclaredEncoding CD{..} t =
                                       ucsdet_setDeclaredEncoding p ptr (fromIntegral len)
     writeIORef cdEncoding t
 
-foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_setText" ucsdet_setText :: Ptr UCharsetDetector -> CString -> Int32 -> Ptr UErrorCode -> IO ()
-
-foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_setDeclaredEncoding" ucsdet_setDeclaredEncoding :: Ptr UCharsetDetector -> CString -> Int32 -> Ptr UErrorCode -> IO ()
+detect :: CharsetDetector a -> IO CharsetMatch
+detect CD{..} = do
+  cm <- withForeignPtr cdDetector $ \p -> handleError (ucsdet_detect p)
+  let match = CM cm
+  writeIORef cdMatch match
+  return match
 
 foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_open" ucsdet_open :: Ptr UErrorCode -> IO (Ptr UCharsetDetector)
 
 foreign import ccall unsafe "hs_text_icu.h &__hs_ucsdet_close" ucsdet_close :: FunPtr (Ptr UCharsetDetector -> IO ())
+
+foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_setText" ucsdet_setText :: Ptr UCharsetDetector -> CString -> Int32 -> Ptr UErrorCode -> IO ()
+
+foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_setDeclaredEncoding" ucsdet_setDeclaredEncoding :: Ptr UCharsetDetector -> CString -> Int32 -> Ptr UErrorCode -> IO ()
+
+foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_detect" ucsdet_detect :: Ptr UCharsetDetector -> Ptr UErrorCode -> IO (Ptr UCharsetMatch)

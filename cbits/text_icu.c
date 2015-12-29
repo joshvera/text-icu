@@ -563,8 +563,8 @@ void __hs_ucsdet_setDeclaredEncoding(UCharsetDetector *ucsd, const char *encodin
     ucsdet_setDeclaredEncoding(ucsd, encoding, length, status);
 }
 
-void __hs_ucsdet_detect(UCharsetDetector *ucsd, UErrorCode *status) {
-    ucsdet_detect(ucsd, status);
+const UCharsetMatch *__hs_ucsdet_detect(UCharsetDetector *ucsd, UErrorCode *status) {
+    return ucsdet_detect(ucsd, status);
 }
 
 const UCharsetMatch **__hs_ucsdet_detectAll(UCharsetDetector *ucsd, int32_t *matchesFound, UErrorCode *status) {

@@ -231,7 +231,7 @@ void __hs_ucsdet_setText(UCharsetDetector *ucsd, const char *textIn, int32_t len
 
 void __hs_ucsdet_setDeclaredEncoding(UCharsetDetector *ucsd, const char *encoding, int32_t length, UErrorCode *status);
 
-void __hs_ucsdet_detect(UCharsetDetector *ucsd, UErrorCode *status);
+const UCharsetMatch *__hs_ucsdet_detect(UCharsetDetector *ucsd, UErrorCode *status);
 
 const UCharsetMatch **__hs_ucsdet_detectAll(UCharsetDetector *ucsd, int32_t *matchesFound, UErrorCode *status);
 
