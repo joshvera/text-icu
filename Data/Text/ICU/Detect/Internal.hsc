@@ -15,6 +15,7 @@ import Data.Text (Text)
 
 data CharsetDetector a = CD {
         cdText :: IORef Text
+      , cdEncoding :: IORef Text
       , cdStatus :: Int32 -> a
       , cdDetector :: ForeignPtr UCharsetDetector
       }

@@ -16,7 +16,8 @@ open :: (Int32 -> a) -> IO (CharsetDetector a)
 open f = do
   cd <- handleError ucsdet_open
   r <- newIORef empty
-  CD r f `fmap` newForeignPtr ucsdet_close cd
+  encoding <- newIORef empty
+  CD r encoding f `fmap` newForeignPtr ucsdet_close cd
 
 setText :: CharsetDetector a -> Text -> IO ()
 setText CD{..} t =
@@ -25,9 +26,16 @@ setText CD{..} t =
                                         ucsdet_setText p ptr (fromIntegral len)
       writeIORef cdText t
 
-
+setDeclaredEncoding :: CharsetDetector a -> Text -> IO ()
+setDeclaredEncoding CD{..} t =
+  withCStringLen t $ \(ptr, len) -> do
+    withForeignPtr cdDetector $ \p -> handleError $
+                                      ucsdet_setDeclaredEncoding p ptr (fromIntegral len)
+    writeIORef cdEncoding t
 
 foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_setText" ucsdet_setText :: Ptr UCharsetDetector -> CString -> Int32 -> Ptr UErrorCode -> IO ()
+
+foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_setDeclaredEncoding" ucsdet_setDeclaredEncoding :: Ptr UCharsetDetector -> CString -> Int32 -> Ptr UErrorCode -> IO ()
 
 foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_open" ucsdet_open :: Ptr UErrorCode -> IO (Ptr UCharsetDetector)
 
