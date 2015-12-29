@@ -1,4 +1,4 @@
-{-# LANGUAGE EmptyDataDecls, ForeignFunctionInterface #-}
+{-# LANGUAGE EmptyDataDecls, ForeignFunctionInterface, RecordWildCards #-}
 
 module Data.Text.ICU.Detect.Internal
     (
@@ -7,7 +7,9 @@ module Data.Text.ICU.Detect.Internal
       CharsetDetector (..),
       UCharsetDetector,
       CharsetMatch(..),
-      UCharsetMatch
+      UCharsetMatch,
+      getConfidence,
+      getName
      ) where
 
 import Data.Int (Int32)
@@ -30,7 +32,7 @@ data CharsetDetector a = CD {
 
 data UCharsetDetector
 
-data CharsetMatch = CM !(Ptr UCharsetMatch)
+data CharsetMatch = CM { cmMatch :: !(Ptr UCharsetMatch) }
                   deriving (Eq, Typeable)
 
 data UCharsetMatch
@@ -38,14 +40,16 @@ data UCharsetMatch
 instance Show CharsetMatch where
     show c = "CharsetMatch " ++ show (getName c)
 
-withMatch :: CharsetMatch -> (Ptr UCharsetMatch -> IO a) -> IO a
-{-# INLINE withMatch #-}
-withMatch (CM match) action = action match
-
 getName :: CharsetMatch -> String
-getName match = unsafePerformIO .
-    withMatch match $ \ptr ->
-        peekCString =<< handleError (ucsdet_getName ptr)
+getName CM{..} = unsafePerformIO $
+        peekCString =<< handleError (ucsdet_getName cmMatch)
+
+getConfidence :: CharsetMatch -> Int32
+getConfidence CM{..} = unsafePerformIO $
+  handleError (ucsdet_getConfidence cmMatch)
 
 foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_getName" ucsdet_getName
     :: Ptr UCharsetMatch -> Ptr UErrorCode -> IO CString
+
+foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_getConfidence" ucsdet_getConfidence
+    :: Ptr UCharsetMatch -> Ptr UErrorCode -> IO Int32
