@@ -23,16 +23,16 @@ open f = do
 setText :: CharsetDetector a -> ByteString -> IO ()
 setText CD{..} t =
   useAsCStringLen t $ \(ptr, len) -> do
-            withForeignPtr cdDetector $ \p -> handleError $
-                                              ucsdet_setText p ptr (fromIntegral len)
-            writeIORef cdBytestring t
+    withForeignPtr cdDetector $ \p -> handleError $
+                                      ucsdet_setText p ptr (fromIntegral len)
+    writeIORef cdBytestring t
 
 setDeclaredEncoding :: CharsetDetector a -> ByteString -> IO ()
 setDeclaredEncoding CD{..} t =
   useAsCStringLen t $ \(ptr, len) -> do
-                   withForeignPtr cdDetector $ \p -> handleError $
-                                                     ucsdet_setDeclaredEncoding p ptr (fromIntegral len)
-                   writeIORef cdEncoding t
+  withForeignPtr cdDetector $ \p -> handleError $
+                                    ucsdet_setDeclaredEncoding p ptr (fromIntegral len)
+  writeIORef cdEncoding t
 
 detectCharset :: ByteString -> IO String
 detectCharset text = do

@@ -24,22 +24,22 @@ import Foreign.C.String (CString, peekCString)
 import System.IO.Unsafe (unsafePerformIO)
 
 data CharsetDetector a = CD {
-        cdBytestring :: IORef ByteString
-      , cdEncoding :: IORef ByteString
-      , cdMatch :: IORef CharsetMatch
-      , cdStatus :: Int32 -> a
-      , cdDetector :: ForeignPtr UCharsetDetector
-      }
+  cdBytestring :: IORef ByteString,
+  cdEncoding :: IORef ByteString,
+  cdMatch :: IORef CharsetMatch,
+  cdStatus :: Int32 -> a,
+  cdDetector :: ForeignPtr UCharsetDetector
+}
 
 data UCharsetDetector
 
 data CharsetMatch = CM { cmMatch :: !(ForeignPtr UCharsetMatch) }
-                  deriving (Eq, Typeable)
+  deriving (Eq, Typeable)
 
 data UCharsetMatch
 
 instance Show CharsetMatch where
-    show c = "CharsetMatch " ++ show (unsafePerformIO $ getName c)
+  show c = "CharsetMatch " ++ show (unsafePerformIO $ getName c)
 
 
 detect :: CharsetDetector a -> IO String
@@ -63,13 +63,11 @@ getLanguage CM{..} =
   withForeignPtr cmMatch $ \p ->
                             peekCString =<< handleError (ucsdet_getLanguage p)
 
-foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_getName" ucsdet_getName
-    :: Ptr UCharsetMatch -> Ptr UErrorCode -> IO CString
 
-foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_getLanguage" ucsdet_getLanguage
-    :: Ptr UCharsetMatch -> Ptr UErrorCode -> IO CString
+foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_getName" ucsdet_getName :: Ptr UCharsetMatch -> Ptr UErrorCode -> IO CString
 
-foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_getConfidence" ucsdet_getConfidence
-    :: Ptr UCharsetMatch -> Ptr UErrorCode -> IO Int32
+foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_getLanguage" ucsdet_getLanguage :: Ptr UCharsetMatch -> Ptr UErrorCode -> IO CString
+
+foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_getConfidence" ucsdet_getConfidence :: Ptr UCharsetMatch -> Ptr UErrorCode -> IO Int32
 
 foreign import ccall unsafe "hs_text_icu.h __hs_ucsdet_detect" ucsdet_detect :: Ptr UCharsetDetector -> Ptr UErrorCode -> IO (Ptr UCharsetMatch)
