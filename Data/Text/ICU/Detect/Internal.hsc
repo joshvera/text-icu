@@ -2,7 +2,6 @@
 
 module Data.Text.ICU.Detect.Internal
     (
-
       -- * Unicode charset detection API
       CharsetDetector (..),
       UCharsetDetector,
