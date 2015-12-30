@@ -6,8 +6,9 @@
 
 #include "unicode/ubrk.h"
 #include "unicode/uchar.h"
-#include "unicode/ucol.h"
 #include "unicode/ucnv.h"
+#include "unicode/ucol.h"
+#include "unicode/ucsdet.h"
 #include "unicode/uiter.h"
 #include "unicode/unorm.h"
 #include "unicode/uregex.h"
@@ -218,3 +219,37 @@ int32_t __hs_uspoof_getSkeleton(USpoofChecker *sc, int32_t checks,
 int32_t __hs_uspoof_serialize(USpoofChecker *sc, void *data, int32_t capacity,
                               UErrorCode *status);
 void __hs_uspoof_close(USpoofChecker *sc);
+
+
+/* ucsdet.h */
+
+UCharsetDetector *__hs_ucsdet_open(UErrorCode *status);
+
+void __hs_ucsdet_close(UCharsetDetector *ucsd);
+
+void __hs_ucsdet_setText(UCharsetDetector *ucsd, const char *textIn, int32_t len, UErrorCode *status);
+
+void __hs_ucsdet_setDeclaredEncoding(UCharsetDetector *ucsd, const char *encoding, int32_t length, UErrorCode *status);
+
+const UCharsetMatch *__hs_ucsdet_detect(UCharsetDetector *ucsd, UErrorCode *status);
+
+const UCharsetMatch **__hs_ucsdet_detectAll(UCharsetDetector *ucsd, int32_t *matchesFound, UErrorCode *status);
+
+const char *__hs_ucsdet_getName(const UCharsetMatch *ucsm, UErrorCode *status);
+
+int32_t __hs_ucsdet_getConfidence(const UCharsetMatch *ucsm, UErrorCode *status);
+
+const char *__hs_ucsdet_getLanguage(const UCharsetMatch *ucsm, UErrorCode *status);
+
+int32_t __hs_ucsdet_getUChars(const UCharsetMatch *ucsm,
+                              UChar *buf, int32_t cap, UErrorCode *status);
+
+UEnumeration *__hs_ucsdet_getAllDetectableCharsets(const UCharsetDetector *ucsd,  UErrorCode *status);
+
+UBool __hs_ucsdet_isInputFilterEnabled(const UCharsetDetector *ucsd);
+
+UBool __hs_ucsdet_enableInputFilter(UCharsetDetector *ucsd, UBool filter);
+
+UEnumeration *__hs_ucsdet_getDetectableCharsets(const UCharsetDetector *ucsd,  UErrorCode *status);
+
+void __hs_ucsdet_setDetectableCharset(UCharsetDetector *ucsd, const char *encoding, UBool enabled, UErrorCode *status);
