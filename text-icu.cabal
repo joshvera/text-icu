@@ -92,6 +92,7 @@ library
   ghc-options: -Wall -fwarn-tabs -static -fPIC
   cpp-options: -DU_STATIC_IMPLEMENTATION=1
   cc-options: -DU_STATIC_IMPLEMENTATION=1
+  ld-options: -static -pthread
 
 test-suite tests
   default-language: Haskell98
