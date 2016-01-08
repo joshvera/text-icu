@@ -89,7 +89,8 @@ library
   else
     extra-libraries: icui18n icudata
 
-  ghc-options: -Wall -fwarn-tabs
+  ghc-options: -Wall -fwarn-tabs -static
+  cpp-options: -DU_STATIC_IMPLEMENTATION=1
 
 test-suite tests
   default-language: Haskell98
