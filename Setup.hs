@@ -6,7 +6,18 @@ import Distribution.Simple.Setup
 import System.Directory
 import System.Process
 
-main = defaultMainWithHooks simpleUserHooks { confHook = conf }
+main = defaultMainWithHooks simpleUserHooks { preConf = pre, confHook = conf }
+
+pre :: Args -> ConfigFlags -> IO P.HookedBuildInfo
+pre args configFlags = do
+  info <- preConf simpleUserHooks args configFlags
+  dir <- getCurrentDirectory
+  (_, _, _, handle) <- createProcess . shell $ "echo Setting up... \\\n"
+    ++ "&& git submodule sync\\\n"
+    ++ "&& git submodule update --recursive\\\n"
+    ++ "&& script/build.sh\\\n"
+  _ <- waitForProcess handle
+  return info
 
 conf :: (P.GenericPackageDescription, P.HookedBuildInfo) -> ConfigFlags -> IO LocalBuildInfo
 conf x flags = do
