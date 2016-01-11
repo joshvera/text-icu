@@ -89,7 +89,7 @@ library
   else
     extra-libraries: icui18n icudata
 
-  ghc-options: -Wall -fwarn-tabs -static -optl-static -fPIC
+  ghc-options: -Wall -fwarn-tabs
   cpp-options: -DU_STATIC_IMPLEMENTATION=1
   cc-options: -DU_STATIC_IMPLEMENTATION=1
 
