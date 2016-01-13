@@ -82,12 +82,7 @@ library
       Data.Text.ICU.Spoof.Pure
       Data.Text.ICU.Text
   c-sources: cbits/text_icu.c
-  include-dirs: include
-  extra-libraries: icuuc
-  if os(mingw32)
-    extra-libraries: icuin icudt
-  else
-    extra-libraries: icui18n icudata
+  include-dirs: include, /usr/local/opt/icu4c/include
 
   ghc-options: -Wall -fwarn-tabs
   cpp-options: -DU_STATIC_IMPLEMENTATION=1
