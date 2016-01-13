@@ -82,7 +82,7 @@ library
       Data.Text.ICU.Spoof.Pure
       Data.Text.ICU.Text
   c-sources: cbits/text_icu.c
-  include-dirs: include
+  include-dirs: include, /usr/local/opt/icu4c/include
 
   ghc-options: -Wall -fwarn-tabs
   cpp-options: -DU_STATIC_IMPLEMENTATION=1
