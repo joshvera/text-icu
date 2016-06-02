@@ -87,6 +87,11 @@ library
   ghc-options: -Wall -fwarn-tabs
   cpp-options: -DU_STATIC_IMPLEMENTATION=1
   cc-options: -DU_STATIC_IMPLEMENTATION=1
+  extra-libraries: icuuc
+  if os(mingw32)
+    extra-libraries: icuin icudt
+  else
+    extra-libraries: icui18n icudata
 
 test-suite tests
   default-language: Haskell98
