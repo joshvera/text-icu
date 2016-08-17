@@ -83,6 +83,7 @@ library
       Data.Text.ICU.Text
   c-sources: cbits/text_icu.c
   include-dirs: include, /usr/local/opt/icu4c/include
+  extra-lib-dirs: /usr/local/opt/icu4c/lib
   extra-libraries: icuuc
   if os(mingw32)
     extra-libraries: icuin icudt
