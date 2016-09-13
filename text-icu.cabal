@@ -82,7 +82,10 @@ library
       Data.Text.ICU.Spoof.Pure
       Data.Text.ICU.Text
   c-sources: cbits/text_icu.c
-  include-dirs: include, /usr/local/opt/icu4c/include
+  if os(darwin)
+    include-dirs: include, /usr/local/opt/icu4c/include
+  else
+    include-dirs: include
   if os(darwin)
     extra-lib-dirs: /usr/local/opt/icu4c/lib
   if os(darwin)
