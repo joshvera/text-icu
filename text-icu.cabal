@@ -85,7 +85,7 @@ library
   if os(darwin)
     include-dirs: include, /usr/local/Cellar/icu4c/57.1/include
   else
-    include-dirs: include
+    include-dirs: include, /usr/local/opt/icu4c/include
   if os(darwin)
     extra-lib-dirs: /usr/local/Cellar/icu4c/57.1/lib
   if os(mingw32)
