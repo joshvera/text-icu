@@ -90,6 +90,8 @@ library
     extra-lib-dirs: /usr/local/Cellar/icu4c/57.1/lib
   if os(mingw32)
     extra-libraries: icuuc icuin icudt
+  if os(darwin)
+    extra-libraries: icudata icuuc icui18n
 
   ghc-options: -Wall -fwarn-tabs
   cpp-options: -DU_STATIC_IMPLEMENTATION=1
