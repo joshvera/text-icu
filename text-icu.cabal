@@ -83,11 +83,11 @@ library
       Data.Text.ICU.Text
   c-sources: cbits/text_icu.c
   if os(darwin)
-    include-dirs: include, /usr/local/Cellar/icu4c/57.1/include
+    include-dirs: include, /usr/local/Cellar/icu4c/58.2/include
   else
     include-dirs: include, /usr/local/opt/icu4c/include
   if os(darwin)
-    extra-lib-dirs: /usr/local/Cellar/icu4c/57.1/lib
+    extra-lib-dirs: /usr/local/Cellar/icu4c/58.2/lib
   if os(mingw32)
     extra-libraries: icuuc icuin icudt
   if os(darwin)
